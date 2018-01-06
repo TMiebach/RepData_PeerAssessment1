@@ -11,12 +11,7 @@ title: 'Reproducible Research: Peer Assessment 1'
 A link to the original assignment can be found [here](https://www.coursera.org/learn/reproducible-research/peer/gYyPt/course-project-1).
 The paragraphs "Description" and "Data" below were copied into this document for reference.
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(fig.path = "images/")
-library(dplyr)
-library(ggplot2)
-```
+
 
 ##Description
 
@@ -62,7 +57,8 @@ dataset.
 
 ## Loading and preprocessing the data
 
-```{r Read data} 
+
+```r
 # Unzip data file (if necessary) and read data
     if(!file.exists("activity.csv")){
         unzip("activity.zip")
@@ -77,16 +73,17 @@ dataset.
     n_unique_intervals <- length(unique(mydata$interval))
 ```
 
-**`r mydata_frame_dimensions[1]`** observations of **`r mydata_frame_dimensions[2]`** variables (**`r variable_names`**) 
+**17568** observations of **3** variables (**steps, date, interval**) 
 were assigned ot the data frame **mydata**.  
-Variable **date** contains **`r n_unique_days`** unique days.  
-Variable **interval** contains **`r n_unique_intervals`** unique 5 minute intervals per day.  
-Variable **steps** contains **`r n_missing`** missing ("NA") values.  
+Variable **date** contains **61** unique days.  
+Variable **interval** contains **288** unique 5 minute intervals per day.  
+Variable **steps** contains **2304** missing ("NA") values.  
 For additional analysis regarding missing data see "Imputing Missing Values" section below.
 
 ## What is mean total number of steps taken per day?
 
-```{r Analysis of steps per day}
+
+```r
 # Calulate total number of steps for each unique day. It is important not to 
 # remove missing values as the sum for days with missing values calculates  
 # incorrectly to "0" instead of "NA"
@@ -94,43 +91,58 @@ For additional analysis regarding missing data see "Imputing Missing Values" sec
 
 # Plot Histogram of data; missing data will be excluded from graph
     ggplot(steps_by_day, aes(steps_sum)) + geom_histogram(bins = 20) + xlab("Total Steps Per Day") + ylab("Frequency") + ggtitle("Histogram of Total Number of Steps Taken Per Day")
-    
+```
+
+```
+## Warning: Removed 8 rows containing non-finite values (stat_bin).
+```
+
+![plot of chunk Analysis of steps per day](images/Analysis of steps per day-1.png)
+
+```r
 # Calculate mean and median; need to exclude mssing data here.
     steps_mean <- mean(steps_by_day$steps_sum, na.rm = TRUE)
     steps_median <- median(steps_by_day$steps_sum, na.rm = TRUE)
 ```
 Days with missing data were excluded from graph.  
-The mean number of steps is **`r format(steps_mean, digits = 0, scientific = FALSE)`**.  
-The median number of steps is **`r format(steps_median, digits = 0, scientific = FALSE)`**.  
+The mean number of steps is **10766**.  
+The median number of steps is **10765**.  
 
 ## What is the average daily activity pattern?
 
-```{r Analysis of average daily steps for each time interval}
+
+```r
 # calulate the average number of steps for each unique time interval
     steps_average_by_interval <- mydata %>% group_by(interval) %>% summarise(steps_average = mean(steps, na.rm = TRUE))
 
 # Plot Histogram of data
     g <- ggplot(steps_average_by_interval, aes(interval, steps_average))
     g + geom_line() + xlab("Time (5 min interval identifier)") + ylab("Average Steps") + ggtitle("Average Number of Steps During the Day")
+```
 
+![plot of chunk Analysis of average daily steps for each time interval](images/Analysis of average daily steps for each time interval-1.png)
+
+```r
 # Determine interval of highest average step count
 # Round average step count to nearest whole step
     steps_max <- round(steps_average_by_interval[which.max(steps_average_by_interval$steps_average),], digits = 0)
 ```
 
-The maximum average step count of **`r steps_max[2]`** occurs at time interval identifier **`r steps_max[1]`**.
+The maximum average step count of **206** occurs at time interval identifier **835**.
 
 ## Imputing missing values
 
-Variable **steps** contains **`r n_missing`** missing ("NA") values.
+Variable **steps** contains **2304** missing ("NA") values.
 
-```{r Evaluate missing data I}
+
+```r
 data_missing <- mydata[is.na(mydata$steps),]
 n_dates_missing <- length(unique(data_missing$date))
 ```
 
-Analysis of the missing data shows that the missing values are represeneted by **`r n_dates_missing`** unique dates.  
-```{r Evaluate missing data II}
+Analysis of the missing data shows that the missing values are represeneted by **8** unique dates.  
+
+```r
 # Confirm for each date that step data is present (originally done manually)
     n <- integer(1)
     for(i in 1:length(data_missing$date)){
@@ -139,12 +151,13 @@ Analysis of the missing data shows that the missing values are represeneted by *
     }
 ```
 
-**`r n`** step data points were collected for these unique dates.
+**0** step data points were collected for these unique dates.
 
 It was decided to replace the missing values with the overall mean of the daily steps.  
 This should have no impact on the calculated mean and minimal impact on the median.
 
-```{r Replace NA values}
+
+```r
 # Copy mydata to mydata_filled
     mydata_filled <- mydata
 
@@ -153,26 +166,32 @@ This should have no impact on the calculated mean and minimal impact on the medi
 ```
 
 
-```{r Re-Analysis of steps per day}
+
+```r
 # recalulate total number of steps for each unique day with filled data
     steps_by_day_filled <- mydata_filled %>% group_by(date) %>% summarise(steps_sum = sum(steps, na.rm = FALSE))
 
 # Plot Histogram of data
     ggplot(steps_by_day_filled, aes(steps_sum)) + geom_histogram(bins = 20) + xlab("Total Steps Per Day") + ylab("Frequency") + ggtitle("Histogram of Total Number of Steps Taken Per Day")
-    
+```
+
+![plot of chunk Re-Analysis of steps per day](images/Re-Analysis of steps per day-1.png)
+
+```r
 # Calculate mean and median with filled data
 # Round mean step count to nearest whole step
     steps_mean_filled <- mean(steps_by_day_filled$steps_sum, na.rm = TRUE)
     steps_median_filled <- median(steps_by_day_filled$steps_sum, na.rm = TRUE)
 ```
 
-The mean number of steps is **`r format(steps_mean_filled, digits = 0, scientific = FALSE)`**.  
-The median number of steps is **`r format(steps_median_filled, digits = 0, scientific = FALSE)`**.  
+The mean number of steps is **10766**.  
+The median number of steps is **10766**.  
 As anticipated, the mean has not changed and the median was only slightly affected.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r Add variable corresponding to weekday/weekend}
+
+```r
 # Generate columns with weekday information
     mydata_filled$weekday <- weekdays(mydata_filled$date, abbreviate = TRUE)
 # Replace Mon:Fri with "weekday" and Sat:Sun with "weekend"
@@ -186,7 +205,8 @@ As anticipated, the mean has not changed and the median was only slightly affect
     }
 ```
 
-```{r calculate average by interval and group by weekday}
+
+```r
 # calculate the average number of steps for each unique time interval
     steps_average_by_interval <- mydata_filled %>% group_by(interval, weekday) %>% summarise(steps_average = mean(steps, na.rm = TRUE))
 
@@ -194,5 +214,7 @@ As anticipated, the mean has not changed and the median was only slightly affect
     g <- ggplot(steps_average_by_interval, aes(interval, steps_average))
     g + geom_line() + facet_grid(weekday ~ .) + xlab("Time (5 min interval identifier)") + ylab("Average Steps") + ggtitle("Average Number of Steps During the Day")
 ```
+
+![plot of chunk calculate average by interval and group by weekday](images/calculate average by interval and group by weekday-1.png)
 
 
