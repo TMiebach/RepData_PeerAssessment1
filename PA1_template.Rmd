@@ -2,9 +2,9 @@
 html_document: PA1_template.html
 author: "Thomas Miebach"
 date: "January 4, 2018"
-output: html_document
+output: rmarkdown::github_document
 keep_md: true
-self_contained: true
+self_contained: TRUE
 title: 'Reproducible Research: Peer Assessment 1'
 ---
 
@@ -86,7 +86,7 @@ For additional analysis regarding missing data see "Imputing Missing Values" sec
 
 ## What is mean total number of steps taken per day?
 
-```{r Analysis of steps per day}
+```{r Analysis_of_steps_per_day}
 # Calulate total number of steps for each unique day. It is important not to 
 # remove missing values as the sum for days with missing values calculates  
 # incorrectly to "0" instead of "NA"
@@ -105,7 +105,7 @@ The median number of steps is **`r format(steps_median, digits = 0, scientific =
 
 ## What is the average daily activity pattern?
 
-```{r Analysis of average daily steps for each time interval}
+```{r Analysis_of_average_daily_steps_for_each_time_interval}
 # calulate the average number of steps for each unique time interval
     steps_average_by_interval <- mydata %>% group_by(interval) %>% summarise(steps_average = mean(steps, na.rm = TRUE))
 
@@ -130,7 +130,7 @@ n_dates_missing <- length(unique(data_missing$date))
 ```
 
 Analysis of the missing data shows that the missing values are represeneted by **`r n_dates_missing`** unique dates.  
-```{r Evaluate missing data II}
+```{r Evaluate_missing_data_II}
 # Confirm for each date that step data is present (originally done manually)
     n <- integer(1)
     for(i in 1:length(data_missing$date)){
@@ -153,7 +153,7 @@ This should have no impact on the calculated mean and minimal impact on the medi
 ```
 
 
-```{r Re-Analysis of steps per day}
+```{r Re-Analysis_of_steps_per_day}
 # recalulate total number of steps for each unique day with filled data
     steps_by_day_filled <- mydata_filled %>% group_by(date) %>% summarise(steps_sum = sum(steps, na.rm = FALSE))
 
@@ -186,7 +186,7 @@ As anticipated, the mean has not changed and the median was only slightly affect
     }
 ```
 
-```{r calculate average by interval and group by weekday}
+```{r calculate_average_by_interval_and_group_by_weekday}
 # calculate the average number of steps for each unique time interval
     steps_average_by_interval <- mydata_filled %>% group_by(interval, weekday) %>% summarise(steps_average = mean(steps, na.rm = TRUE))
 
